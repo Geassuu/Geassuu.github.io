@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>虚幻引擎受击检测插件 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="攻击判定一般使用射线检测，但逐帧射线判定实在繁琐，所以可以使用球形射线判定。开始前，先新建一个专用的碰撞检测通道，免得碰到其他什么东西也产生命中事件直接在触发动画的同时发射检测了，又实在觉得不自然就加了个延时通道选择之前新创建的再新建个挨打的角色创建后打开蓝图，设置角色模型新建动画蓝图，设置待机动画进入蓝图接口，创建函数，默认没有返回输出值，必须添加一个不然在角色蓝图里添加了打不开写不了定义 进入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚幻引擎受击检测插件">
+<meta property="og:url" content="http://example.com/2022/05/17/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%8F%97%E5%87%BB%E6%A3%80%E6%B5%8B%E6%8F%92%E4%BB%B6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="攻击判定一般使用射线检测，但逐帧射线判定实在繁琐，所以可以使用球形射线判定。开始前，先新建一个专用的碰撞检测通道，免得碰到其他什么东西也产生命中事件直接在触发动画的同时发射检测了，又实在觉得不自然就加了个延时通道选择之前新创建的再新建个挨打的角色创建后打开蓝图，设置角色模型新建动画蓝图，设置待机动画进入蓝图接口，创建函数，默认没有返回输出值，必须添加一个不然在角色蓝图里添加了打不开写不了定义 进入">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/1.png?raw=true">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/2.png?raw=true">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/3.png?raw=true">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/4.png?raw=true">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/5.png?raw=true">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/6.png?raw=true">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/7.png?raw=true">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/8.png?raw=true">
+<meta property="og:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/13.png?raw=true">
+<meta property="article:published_time" content="2022-05-17T11:45:02.000Z">
+<meta property="article:modified_time" content="2022-05-17T12:31:29.566Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/1.png?raw=true">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-虚幻引擎受击检测插件" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/05/17/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%8F%97%E5%87%BB%E6%A3%80%E6%B5%8B%E6%8F%92%E4%BB%B6/" class="article-date">
+  <time datetime="2022-05-17T11:45:02.000Z" itemprop="datePublished">2022-05-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      虚幻引擎受击检测插件
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>攻击判定一般使用射线检测，但逐帧射线判定实在繁琐，所以可以使用球形射线判定。<br>开始前，先新建一个专用的碰撞检测通道，免得碰到其他什么东西也产生命中事件<br><img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/1.png?raw=true" alt="avatar"><br>直接在触发动画的同时发射检测了，又实在觉得不自然就加了个延时<br><img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/2.png?raw=true" alt="avatar"><br>通道选择之前新创建的<br><img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/3.png?raw=true" alt="avatar"><br>再新建个挨打的角色<br><img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/4.png?raw=true" alt="avatar"><br><img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/5.png?raw=true" alt="avatar"><br>创建后打开蓝图，设置角色模型<br><img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/6.png?raw=true" alt="avatar"><br>新建动画蓝图，设置待机动画<br><img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/7.png?raw=true" alt="avatar"><br><img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/8.png?raw=true" alt="avatar"><br>进入蓝图接口，创建函数，默认没有返回输出值，必须添加一个不然在角色蓝图里添加了打不开写不了定义</p>
+<p>进入角色蓝图，在类设置添加接口</p>
+<p> 再选择网格体，设置碰撞类型，必须设置之前新建的碰撞检测通道为阻挡才能发生命中事件</p>
+<p>  回到玩家角色蓝图，在发射射线检测函数的后面加上如果返回了命中就调用接口<br>  <img src="https://github.com/Geassuu/picture/blob/main/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%94%BB%E5%87%BB%E6%A3%80%E6%B5%8B/13.png?raw=true" alt="avatar"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2022/05/17/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%8F%97%E5%87%BB%E6%A3%80%E6%B5%8B%E6%8F%92%E4%BB%B6/" data-id="cl3a4xtoq0001twigaogrff47" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2022/05/17/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/05/17/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%8F%97%E5%87%BB%E6%A3%80%E6%B5%8B%E6%8F%92%E4%BB%B6/">虚幻引擎受击检测插件</a>
+          </li>
+        
+          <li>
+            <a href="/2022/05/17/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
